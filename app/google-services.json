@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "367253727212",
+    "project_id": "locationreminderapp-fwd",
+    "storage_bucket": "locationreminderapp-fwd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:367253727212:android:1164a406ae7725b43f82c9",
+        "android_client_info": {
+          "package_name": "com.udacity.project4"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "367253727212-0v2rul7equtm592q10q4tlabqgoqcgik.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCTmOGOQNoIhf6GHhpjscnSMXi8iKrmtHw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "367253727212-0v2rul7equtm592q10q4tlabqgoqcgik.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
