@@ -28,6 +28,12 @@ import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.utils.Constants.LOCATION_PERMISSION_INDEX
+import com.udacity.project4.utils.Constants.REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE
+import com.udacity.project4.utils.Constants.REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
+import com.udacity.project4.utils.Constants.TAG
+import com.udacity.project4.utils.Utils.foregroundAndBackgroundLocationPermissionApproved
+import com.udacity.project4.utils.Utils.runningQOrLater
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
 import java.util.*
@@ -43,9 +49,6 @@ class SelectLocationFragment : BaseFragment() {
     var locator: FusedLocationProviderClient? = null
 
     var marker: MarkerOptions? = null
-
-    private val runningQOrLater =
-        android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -113,7 +116,7 @@ class SelectLocationFragment : BaseFragment() {
     private fun getDeviceLocation(map: GoogleMap?) {
         Log.d(TAG, "getDeviceLocation")
         try {
-            if (foregroundAndBackgroundLocationPermissionApproved()) {
+            if (foregroundAndBackgroundLocationPermissionApproved(requireContext())) {
                 val locationResult = locator?.lastLocation
                 locationResult?.addOnCompleteListener(requireActivity()) { task ->
                     if (task.isSuccessful) {
@@ -228,9 +231,8 @@ class SelectLocationFragment : BaseFragment() {
 
     @TargetApi(29)
     private fun requestForegroundAndBackgroundLocationPermissions() {
-        if (foregroundAndBackgroundLocationPermissionApproved())
+        if (foregroundAndBackgroundLocationPermissionApproved(requireContext()))
             return
-
 
         // Else request the permission
         // this provides the result[LOCATION_PERMISSION_INDEX]
@@ -292,25 +294,6 @@ class SelectLocationFragment : BaseFragment() {
         }
     }
 
-    @TargetApi(29)
-    private fun foregroundAndBackgroundLocationPermissionApproved(): Boolean {
-        val foregroundLocationApproved = (
-                PackageManager.PERMISSION_GRANTED ==
-                        ActivityCompat.checkSelfPermission(
-                            requireContext(),
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ))
-        val backgroundPermissionApproved =
-            if (runningQOrLater) {
-                PackageManager.PERMISSION_GRANTED ==
-                        ActivityCompat.checkSelfPermission(
-                            requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                        )
-            } else {
-                true
-            }
-        return foregroundLocationApproved && backgroundPermissionApproved
-    }
 
 
     override fun onResume() {
@@ -345,9 +328,3 @@ class SelectLocationFragment : BaseFragment() {
 }
 
 
-private const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 33
-private const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 34
-private const val REQUEST_TURN_DEVICE_LOCATION_ON = 29
-private const val TAG = "***"
-private const val LOCATION_PERMISSION_INDEX = 0
-private const val BACKGROUND_LOCATION_PERMISSION_INDEX = 1
