@@ -13,7 +13,6 @@ import android.provider.Settings
 import android.provider.SettingsSlicesContract.KEY_LOCATION
 import android.util.Log
 import android.view.*
-import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -28,6 +27,7 @@ import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.utils.Constants.BACKGROUND_LOCATION_PERMISSION_INDEX
 import com.udacity.project4.utils.Constants.LOCATION_PERMISSION_INDEX
 import com.udacity.project4.utils.Constants.REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE
 import com.udacity.project4.utils.Constants.REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
@@ -83,7 +83,7 @@ class SelectLocationFragment : BaseFragment() {
 //            getCurrentLocation(it)
             setMapLongClick(it)
             setPoiClick(it)
-            getDeviceLocation(it)
+//            getDeviceLocation(it)
         }
 //        TODO: zoom to the user location after taking his permission
 //        TODO: add style to the map
@@ -98,7 +98,7 @@ class SelectLocationFragment : BaseFragment() {
 
     @SuppressLint("MissingPermission")
     private fun getCurrentLocation(map: GoogleMap) {
-        val zoom = 15f
+        val zoom = 10f
         locator?.lastLocation?.addOnSuccessListener {
             val myLocation = LatLng(it.latitude, it.longitude)
             marker = MarkerOptions().position(myLocation)
@@ -110,46 +110,45 @@ class SelectLocationFragment : BaseFragment() {
 
     private var lastKnownLocation: Location? = null
     private val defaultLocation = LatLng(-33.8523341, 151.2106085)
-    val DEFAULT_ZOOM = 50f
+    val DEFAULT_ZOOM = 10f
 
     @SuppressLint("MissingPermission")
     private fun getDeviceLocation(map: GoogleMap?) {
         Log.d(TAG, "getDeviceLocation")
         try {
-            if (foregroundAndBackgroundLocationPermissionApproved(requireContext())) {
-                val locationResult = locator?.lastLocation
-                locationResult?.addOnCompleteListener(requireActivity()) { task ->
-                    if (task.isSuccessful) {
-                        // Set the map's camera position to the current location of the device.
-                        lastKnownLocation = task.result
-                        if (lastKnownLocation != null) {
-                            map?.moveCamera(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(
-                                        lastKnownLocation!!.latitude,
-                                        lastKnownLocation!!.longitude
-                                    ), DEFAULT_ZOOM.toFloat()
-                                )
-                            )
-                            marker = MarkerOptions().position(
+            val locationResult = locator?.lastLocation
+            locationResult?.addOnCompleteListener(requireActivity()) { task ->
+                if (task.isSuccessful) {
+                    // Set the map's camera position to the current location of the device.
+                    lastKnownLocation = task.result
+                    if (lastKnownLocation != null) {
+                        map?.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(
                                 LatLng(
                                     lastKnownLocation!!.latitude,
                                     lastKnownLocation!!.longitude
-                                )
+                                ), DEFAULT_ZOOM.toFloat()
                             )
-                            map?.addMarker(marker!!)
-                        }
-                    } else {
-                        Log.d(TAG, "Current location is null. Using defaults.")
-                        Log.e(TAG, "Exception: %s", task.exception)
-                        map?.moveCamera(
-                            CameraUpdateFactory
-                                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
                         )
-                        map?.uiSettings?.isMyLocationButtonEnabled = false
+                        marker = MarkerOptions().position(
+                            LatLng(
+                                lastKnownLocation!!.latitude,
+                                lastKnownLocation!!.longitude
+                            )
+                        )
+                        map?.addMarker(marker!!)
                     }
+                } else {
+                    Log.d(TAG, "Current location is null. Using defaults.")
+                    Log.e(TAG, "Exception: %s", task.exception)
+                    map?.moveCamera(
+                        CameraUpdateFactory
+                            .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
+                    )
+                    map?.uiSettings?.isMyLocationButtonEnabled = false
                 }
             }
+
         } catch (e: SecurityException) {
             Log.e("Exception: %s", e.message, e)
         }
@@ -231,8 +230,10 @@ class SelectLocationFragment : BaseFragment() {
 
     @TargetApi(29)
     private fun requestForegroundAndBackgroundLocationPermissions() {
-        if (foregroundAndBackgroundLocationPermissionApproved(requireContext()))
+        if (foregroundAndBackgroundLocationPermissionApproved(requireContext())) {
+            getDeviceLocation(map)
             return
+        }
 
         // Else request the permission
         // this provides the result[LOCATION_PERMISSION_INDEX]
@@ -240,7 +241,7 @@ class SelectLocationFragment : BaseFragment() {
 
         val resultCode = when {
             runningQOrLater -> {
-//                permissionsArray += Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                permissionsArray += Manifest.permission.ACCESS_BACKGROUND_LOCATION
                 REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE
             }
             else -> REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE
@@ -262,17 +263,16 @@ class SelectLocationFragment : BaseFragment() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         Log.d(TAG, "onRequestPermissionResult")
 
-//        if (
-//            grantResults.isEmpty() ||
-//            grantResults[LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
-//            (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE &&
-//                    grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
-//                    PackageManager.PERMISSION_DENIED)
-//        )
         if (
             grantResults.isEmpty() ||
             grantResults[LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED ||
-            (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE ))
+            (requestCode == REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE &&
+                    grantResults[BACKGROUND_LOCATION_PERMISSION_INDEX] ==
+                    PackageManager.PERMISSION_DENIED)
+        )
+//        if (
+//            grantResults.isEmpty() ||
+//            grantResults[LOCATION_PERMISSION_INDEX] == PackageManager.PERMISSION_DENIED)
         {
             // Permission denied.
             Snackbar.make(
@@ -293,7 +293,6 @@ class SelectLocationFragment : BaseFragment() {
             getDeviceLocation(map)
         }
     }
-
 
 
     override fun onResume() {
