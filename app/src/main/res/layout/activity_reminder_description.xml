@@ -10,24 +10,103 @@
             type="com.udacity.project4.locationreminders.reminderslist.ReminderDataItem" />
     </data>
 
-    <LinearLayout
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
         tools:context=".locationreminders.ReminderDescriptionActivity">
-        <!--TODO: add the design of the reminder details-->
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Reminder Details"
-            android:textSize="@dimen/text_size_large"
-            app:layout_constraintBottom_toBottomOf="parent"
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="200dp"
+            android:layout_height="270dp"
+            android:layout_gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:srcCompat="@drawable/reminders" />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/tvTitle"
+            style="@style/TextViewReminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/title"
+            app:layout_constraintEnd_toStartOf="@+id/tvReminderTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView" />
+
+        <TextView
+            android:id="@+id/tvDesc"
+            style="@style/TextViewReminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/description"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvTitle"
+            app:layout_constraintEnd_toStartOf="@id/tvReminderDesc"/>
+
+        <TextView
+            android:id="@+id/tvLocation"
+            style="@style/TextViewReminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/location"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDesc" />
+
+        <TextView
+            android:id="@+id/tvLatLng"
+            style="@style/TextViewReminder"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/latlng"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvLocation" />
+
+        <TextView
+            android:id="@+id/tvReminderTitle"
+            style="@style/TextViewReminderDetails"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{reminderDataItem.title}"
+            app:layout_constraintBottom_toBottomOf="@+id/tvTitle"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/tvTitle"
+            app:layout_constraintTop_toTopOf="@+id/tvTitle" />
+
+        <TextView
+            android:id="@+id/tvReminderDesc"
+            style="@style/TextViewReminderDetails"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{reminderDataItem.description}"
+            app:layout_constraintBottom_toBottomOf="@+id/tvDesc"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvDesc"
+            app:layout_constraintTop_toTopOf="@+id/tvDesc" />
+
+        <TextView
+            android:id="@+id/tvReminderLocation"
+            style="@style/TextViewReminderDetails"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{reminderDataItem.location}"
+            app:layout_constraintBottom_toBottomOf="@+id/tvLocation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvLocation"
+            app:layout_constraintTop_toTopOf="@+id/tvLocation" />
+
+        <TextView
+            android:id="@+id/tvReminderLatLng"
+            style="@style/TextViewReminderDetails"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{String.valueOf(reminderDataItem.longitude)+','+String.valueOf(reminderDataItem.latitude)}"
+            app:layout_constraintBottom_toBottomOf="@+id/tvLatLng"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tvLatLng"
+            app:layout_constraintTop_toTopOf="@+id/tvLatLng" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

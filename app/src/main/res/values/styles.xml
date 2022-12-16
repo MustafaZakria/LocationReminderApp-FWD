@@ -8,4 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="TextViewReminder">
+        <item name="android:textSize">@dimen/text_size_large</item>
+        <item name="android:padding">@dimen/padding_large</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextViewReminderDetails">
+        <item name="android:textSize">@dimen/text_size_normal</item>
+        <item name="android:padding">@dimen/padding_large</item>
+    </style>
 </resources>
