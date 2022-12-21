@@ -18,4 +18,6 @@ object Constants {
     const val EXTRA_GEOFENCE_INDEX = "GEOFENCE_INDEX"
     val GEOFENCE_EXPIRATION_IN_MILLISECONDS: Long = TimeUnit.HOURS.toMillis(1)
 
+
+    const val SIGN_IN_REQUEST_CODE = 0
 }

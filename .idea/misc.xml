@@ -3,11 +3,14 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/Egypt FWD/LocationReminderApp-FWD/app/src/main/res/layout/activity_authentication.xml" value="0.25" />
         <entry key="..\:/Android/Egypt FWD/LocationReminderApp-FWD/app/src/main/res/layout/activity_reminder_description.xml" value="0.264" />
+        <entry key="..\:/Android/Egypt FWD/LocationReminderApp-FWD/app/src/main/res/layout/activity_reminders.xml" value="0.25" />
         <entry key="..\:/Android/Egypt FWD/LocationReminderApp-FWD/app/src/main/res/layout/fragment_reminders.xml" value="0.25" />
         <entry key="..\:/Android/Egypt FWD/LocationReminderApp-FWD/app/src/main/res/layout/fragment_save_reminder.xml" value="0.25" />
         <entry key="..\:/Android/Egypt FWD/LocationReminderApp-FWD/app/src/main/res/layout/fragment_select_location.xml" value="0.25" />
         <entry key="..\:/Android/Egypt FWD/LocationReminderApp-FWD/app/src/main/res/layout/it_reminder.xml" value="0.2441123188405797" />
+        <entry key="..\:/Android/Egypt FWD/LocationReminderApp-FWD/app/src/main/res/menu/main_menu.xml" value="0.21203703703703702" />
       </map>
     </option>
   </component>

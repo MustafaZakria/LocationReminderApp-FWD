@@ -18,4 +18,11 @@
         <item name="android:textSize">@dimen/text_size_normal</item>
         <item name="android:padding">@dimen/padding_large</item>
     </style>
+
+    <style name="GreenTheme" parent="FirebaseUI">
+        <!-- Required for sign-in flow styling -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
 </resources>

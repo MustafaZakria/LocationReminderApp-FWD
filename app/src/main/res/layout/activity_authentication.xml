@@ -17,4 +17,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/btnLogin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:text="@string/login"
+        android:layout_margin="0dp"
+        style="?android:attr/borderlessButtonStyle"
+        android:background="@color/colorAccent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
