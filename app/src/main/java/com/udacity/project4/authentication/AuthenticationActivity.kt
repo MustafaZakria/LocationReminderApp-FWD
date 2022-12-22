@@ -30,9 +30,7 @@ class AuthenticationActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_authentication)
-//         TODO: Implement the create account and sign in using FirebaseUI, use sign in using email and sign in using Google
 
-//          TODO: If the user was authenticated, send him to RemindersActivity
 
         auth = FirebaseAuth.getInstance()
 
@@ -49,7 +47,6 @@ class AuthenticationActivity : AppCompatActivity() {
         viewModel.authenticationState.observe(this, Observer { authenticationState ->
 
             when (authenticationState) {
-                // TODO 2.  If the user is logged in,
                 LoginViewModel.AuthenticationState.AUTHENTICATED -> {
                     navigateToRemindersActivity()
                 }

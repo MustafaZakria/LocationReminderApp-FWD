@@ -239,22 +239,22 @@ class SaveReminderFragment : BaseFragment() {
             addOnCompleteListener {
                 geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
                     addOnSuccessListener {
-                        context?.let {
-                            Toast.makeText(
-                                it, R.string.geofences_added,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+//                        context?.let {
+//                            Toast.makeText(
+//                                it, R.string.geofences_added,
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
                         Log.d(TAG, geofence.requestId)
                         _viewModel.isGeofenceAdded.value = true
                     }
                     addOnFailureListener {
-                        context?.let {
-                            Toast.makeText(
-                                it, R.string.geofences_not_added,
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+//                        context?.let {
+//                            Toast.makeText(
+//                                it, R.string.geofences_not_added,
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
                         if ((it.message != null)) {
                             Log.w(TAG, it.message.toString())
                         }
@@ -275,11 +275,11 @@ class SaveReminderFragment : BaseFragment() {
         geofencingClient.removeGeofences(geofencePendingIntent).run {
             addOnSuccessListener {
                 // Geofences removed
-                context?.let {
-                    Log.d(TAG, it.getString(R.string.geofences_removed))
-                    Toast.makeText(it, R.string.geofences_removed, Toast.LENGTH_SHORT)
-                        .show()
-                }
+//                context?.let {
+//                    Log.d(TAG, it.getString(R.string.geofences_removed))
+//                    Toast.makeText(it, R.string.geofences_removed, Toast.LENGTH_SHORT)
+//                        .show()
+//                }
             }
             addOnFailureListener {
                 // Failed to remove geofences

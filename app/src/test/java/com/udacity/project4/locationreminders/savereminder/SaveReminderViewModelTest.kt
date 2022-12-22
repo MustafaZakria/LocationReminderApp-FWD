@@ -80,8 +80,6 @@ class SaveReminderViewModelTest {
         Assert.assertEquals(title, null)
     }
 
-//    showToast.value = app.getString(R.string.reminder_saved)
-//    navigationCommand.value = NavigationCommand.Back
 
     @Test
     fun saveReminder_setsShowToast() {

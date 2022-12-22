@@ -71,10 +71,8 @@ class SelectLocationFragment : BaseFragment() {
         val mapView = binding.mapView
         mapView.onCreate(savedInstanceState)
 
-//        TODO: zoom to the user location after taking his permission
         requestForegroundLocationPermissionsAndGetUserLocation()
 
-//        TODO: add the map setup implementation
         locator = LocationServices.getFusedLocationProviderClient(requireActivity())
 
         mapView.getMapAsync {
