@@ -49,4 +49,6 @@
     <string name="description">Description</string>
     <string name="location">Location</string>
     <string name="latlng">LatLng</string>
+
+    <string name="reminder_pic">Reminder picture</string>
 </resources>

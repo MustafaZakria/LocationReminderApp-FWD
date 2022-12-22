@@ -18,6 +18,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import com.udacity.project4.locationreminders.data.dto.Result
 import kotlinx.coroutines.test.runTest
+import org.hamcrest.CoreMatchers.nullValue
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -72,5 +73,16 @@ class RemindersLocalRepositoryTest {
         MatcherAssert.assertThat(result.data.location, Is.`is`(reminder.location))
         MatcherAssert.assertThat(result.data.longitude, Is.`is`(reminder.longitude))
         MatcherAssert.assertThat(result.data.latitude, Is.`is`(reminder.latitude))
+    }
+
+    @Test
+    fun getRemindersWhileEmpty_returnNoData() = runTest {
+        // GIVEN - No reminders saved in the database.
+
+        // WHEN  - Task retrieved by ID.
+        val result = localDataSource.getReminders()
+
+        result as Result.Success
+        MatcherAssert.assertThat(result.data, Is.`is`(emptyList()))
     }
 }

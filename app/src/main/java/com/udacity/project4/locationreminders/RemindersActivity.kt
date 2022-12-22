@@ -24,11 +24,8 @@ class RemindersActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.logout -> {
+            R.id.home -> {
                 (nav_host_fragment as NavHostFragment).navController.popBackStack()
-//                AuthUI.getInstance().signOut(this)
-//                startActivity(Intent(this, AuthenticationActivity::class.java))
-//                finish()
                 return true
             }
         }

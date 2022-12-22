@@ -15,7 +15,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
@@ -83,7 +82,6 @@ class SaveReminderFragment : BaseFragment() {
                 NavigationCommand.To(SaveReminderFragmentDirections.actionSaveReminderFragmentToSelectLocationFragment())
         }
 
-
         binding.saveReminder.setOnClickListener {
             val title = _viewModel.reminderTitle.value
             val description = _viewModel.reminderDescription.value
@@ -98,7 +96,7 @@ class SaveReminderFragment : BaseFragment() {
             checkPermissionsAndStartGeofencing()
 
             _viewModel.isGeofenceAdded.observe(viewLifecycleOwner, Observer {
-                if(it) {
+                if (it) {
                     Log.d(TAG, "reminder saved")
                     _viewModel.validateAndSaveReminder(reminder)
                     _viewModel.isGeofenceAdded.value = false
@@ -235,38 +233,25 @@ class SaveReminderFragment : BaseFragment() {
             .addGeofence(geofence)
             .build()
 
-        geofencingClient.removeGeofences(geofencePendingIntent).run {
-            addOnCompleteListener {
-                geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
-                    addOnSuccessListener {
-//                        context?.let {
-//                            Toast.makeText(
-//                                it, R.string.geofences_added,
-//                                Toast.LENGTH_SHORT
-//                            ).show()
-//                        }
-                        Log.d(TAG, geofence.requestId)
-                        _viewModel.isGeofenceAdded.value = true
-                    }
-                    addOnFailureListener {
-//                        context?.let {
-//                            Toast.makeText(
-//                                it, R.string.geofences_not_added,
-//                                Toast.LENGTH_SHORT
-//                            ).show()
-//                        }
-                        if ((it.message != null)) {
-                            Log.w(TAG, it.message.toString())
-                        }
-                    }
+//        geofencingClient.removeGeofences(geofencePendingIntent).run {
+//            addOnCompleteListener {
+        geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
+            addOnSuccessListener {
+                Log.d(TAG, "geofence id:  $geofence.requestId")
+                _viewModel.isGeofenceAdded.value = true
+            }
+            addOnFailureListener {
+                if ((it.message != null)) {
+                    Log.w(TAG, it.message.toString())
                 }
             }
         }
+//            }
+//        }
     }
 
 
     //----------------------------------REMOVING GEOFENCE ONDESTROY ACTIVITY------------------
-
 
     private fun removeGeofences() {
         if (!backgroundLocationPermissionApproved()) {
@@ -275,11 +260,9 @@ class SaveReminderFragment : BaseFragment() {
         geofencingClient.removeGeofences(geofencePendingIntent).run {
             addOnSuccessListener {
                 // Geofences removed
-//                context?.let {
-//                    Log.d(TAG, it.getString(R.string.geofences_removed))
-//                    Toast.makeText(it, R.string.geofences_removed, Toast.LENGTH_SHORT)
-//                        .show()
-//                }
+                context?.let {
+                    Log.d(TAG, getString(R.string.geofences_removed))
+                }
             }
             addOnFailureListener {
                 // Failed to remove geofences
@@ -292,9 +275,8 @@ class SaveReminderFragment : BaseFragment() {
     override fun onDestroy() {
         super.onDestroy()
         _viewModel.onClear()
-        removeGeofences()
+//        removeGeofences()
     }
-
 
 
 }

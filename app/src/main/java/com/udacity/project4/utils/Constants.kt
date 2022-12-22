@@ -18,6 +18,9 @@ object Constants {
     const val EXTRA_GEOFENCE_INDEX = "GEOFENCE_INDEX"
     val GEOFENCE_EXPIRATION_IN_MILLISECONDS: Long = TimeUnit.HOURS.toMillis(1)
 
-
     const val SIGN_IN_REQUEST_CODE = 0
+
+    const val LOCATION_UPDATE_INTERVAL = 3000L
+    const val FASTEST_LOCATION_INTERVAL = 1000L
+    const val DEFAULT_ZOOM = 20f
 }

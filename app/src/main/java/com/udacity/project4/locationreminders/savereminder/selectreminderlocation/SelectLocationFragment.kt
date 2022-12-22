@@ -5,19 +5,21 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.content.Intent
+import android.content.IntentSender
 import android.content.pm.PackageManager
 import android.content.res.Resources
-import android.location.Location
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.provider.Settings
-import android.provider.SettingsSlicesContract.KEY_LOCATION
 import android.util.Log
 import android.view.*
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.databinding.DataBindingUtil
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.LatLng
@@ -30,6 +32,10 @@ import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
+import com.udacity.project4.utils.Constants
+import com.udacity.project4.utils.Constants.DEFAULT_ZOOM
+import com.udacity.project4.utils.Constants.FASTEST_LOCATION_INTERVAL
+import com.udacity.project4.utils.Constants.LOCATION_UPDATE_INTERVAL
 import com.udacity.project4.utils.Constants.REQUEST_FOREGROUND_PERMISSIONS_REQUEST_CODE
 import com.udacity.project4.utils.Constants.TAG
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
@@ -42,18 +48,15 @@ class SelectLocationFragment : BaseFragment() {
     override val _viewModel: SaveReminderViewModel by inject()
     private lateinit var binding: FragmentSelectLocationBinding
 
+    private lateinit var locationCallback: LocationCallback
     var map: GoogleMap? = null
-
     var locator: FusedLocationProviderClient? = null
-
     var marker: MarkerOptions? = null
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        if (savedInstanceState != null) {
-            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION)
-        }
         binding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_select_location, container, false)
 
@@ -68,10 +71,11 @@ class SelectLocationFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val mapView = binding.mapView
         mapView.onCreate(savedInstanceState)
 
-        requestForegroundLocationPermissionsAndGetUserLocation()
+        requestForegroundLocationPermissions()
 
         locator = LocationServices.getFusedLocationProviderClient(requireActivity())
 
@@ -85,18 +89,46 @@ class SelectLocationFragment : BaseFragment() {
         binding.btnSave.setOnClickListener {
             onLocationSelected()
         }
+
+        locationCallback = object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                super.onLocationResult(result)
+                if (foregroundLocationPermissionApproved())
+                    requestForegroundLocationPermissions()
+                result.locations.let { locations ->
+                    for (location in locations) {
+                        map?.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(
+                                    location.latitude,
+                                    location.longitude
+                                ), DEFAULT_ZOOM
+                            )
+                        )
+                        stopLocationUpdates()
+                    }
+                }
+
+            }
+        }
+    }
+
+    private fun stopLocationUpdates() {
+        locator?.removeLocationUpdates(locationCallback)
     }
 
     @SuppressLint("MissingPermission")
-    private fun getCurrentLocation(map: GoogleMap) {
-        val zoom = 10f
-        locator?.lastLocation?.addOnSuccessListener {
-            val myLocation = LatLng(it.latitude, it.longitude)
-            marker = MarkerOptions().position(myLocation)
-            map.addMarker(marker!!)
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(myLocation, zoom))
+    private fun startLocationUpdates() {
+        val request = LocationRequest().apply {
+            interval = LOCATION_UPDATE_INTERVAL
+            fastestInterval = FASTEST_LOCATION_INTERVAL
+            priority = Priority.PRIORITY_HIGH_ACCURACY
         }
-
+        locator?.requestLocationUpdates(
+            request,
+            locationCallback,
+            Looper.getMainLooper()
+        )
     }
 
     private fun setMapStyle(map: GoogleMap) {
@@ -115,46 +147,6 @@ class SelectLocationFragment : BaseFragment() {
             }
         } catch (e: Resources.NotFoundException) {
             Log.e(TAG, "Can't find style. Error: ", e)
-        }
-    }
-
-    private var lastKnownLocation: Location? = null
-    private val defaultLocation = LatLng(-33.8523341, 151.2106085)
-    val DEFAULT_ZOOM = 20
-
-    @SuppressLint("MissingPermission")
-    private fun getDeviceLocation(map: GoogleMap?) {
-        map?.isMyLocationEnabled = true
-        Log.d(TAG, "getDeviceLocation")
-        try {
-            val locationResult = locator?.lastLocation
-            locationResult?.addOnCompleteListener(requireActivity()) { task ->
-                if (task.isSuccessful) {
-                    // Set the map's camera position to the current location of the device.
-                    lastKnownLocation = task.result
-                    if (lastKnownLocation != null) {
-                        map?.moveCamera(
-                            CameraUpdateFactory.newLatLngZoom(
-                                LatLng(
-                                    lastKnownLocation!!.latitude,
-                                    lastKnownLocation!!.longitude
-                                ), DEFAULT_ZOOM.toFloat()
-                            )
-                        )
-                    }
-                } else {
-                    Log.d(TAG, "Current location is null. Using defaults.")
-                    Log.e(TAG, "Exception: %s", task.exception)
-                    map?.moveCamera(
-                        CameraUpdateFactory
-                            .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
-                    )
-                    map?.uiSettings?.isMyLocationButtonEnabled = false
-                }
-            }
-
-        } catch (e: SecurityException) {
-            Log.e("Exception: %s", e.message, e)
         }
     }
 
@@ -229,9 +221,9 @@ class SelectLocationFragment : BaseFragment() {
 
     @SuppressLint("MissingPermission")
     @TargetApi(29)
-    private fun requestForegroundLocationPermissionsAndGetUserLocation() {
+    private fun requestForegroundLocationPermissions() {
         if (foregroundLocationPermissionApproved()) {
-            getDeviceLocation(map)
+            checkDeviceLocationSettings()
             return
         }
 
@@ -270,9 +262,8 @@ class SelectLocationFragment : BaseFragment() {
                     })
 
                 }.show()
-            //after user back from settings we should call getDeviceLocation()
         } else {
-            getDeviceLocation(map)
+            checkDeviceLocationSettings()
         }
     }
 
@@ -286,10 +277,44 @@ class SelectLocationFragment : BaseFragment() {
                         ))
     }
 
+    //------------------------------------ENABLE DEVICE LOCATION-------------------------------------
+
+    private fun checkDeviceLocationSettings(resolve: Boolean = true) {
+        val locationRequest = LocationRequest.create().apply {
+            priority = LocationRequest.PRIORITY_LOW_POWER
+        }
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+
+        val settingsClient = LocationServices.getSettingsClient(requireActivity())
+        val locationSettingsResponseTask =
+            settingsClient.checkLocationSettings(builder.build())
+
+        locationSettingsResponseTask.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException && resolve) {
+                try {
+                    exception.startResolutionForResult(
+                        requireActivity(),
+                        Constants.REQUEST_TURN_DEVICE_LOCATION_ON
+                    )
+                } catch (sendEx: IntentSender.SendIntentException) {
+                    Log.d(TAG, "Error geting location settings resolution: " + sendEx.message)
+                }
+            } else {
+                Snackbar.make(
+                    requireActivity().window.decorView.rootView,
+                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+                ).setAction(android.R.string.ok) {
+                    checkDeviceLocationSettings()
+                }.show()
+            }
+        }
+    }
+
     //------------------------------------------------------------
     override fun onResume() {
         super.onResume()
         binding.mapView.onResume()
+        startLocationUpdates()
     }
 
     override fun onStart() {
