@@ -16,7 +16,7 @@ object Constants {
 
     const val GEOFENCE_RADIUS_IN_METERS = 100f
     const val EXTRA_GEOFENCE_INDEX = "GEOFENCE_INDEX"
-    val GEOFENCE_EXPIRATION_IN_MILLISECONDS: Long = TimeUnit.HOURS.toMillis(1)
+    val GEOFENCE_EXPIRATION_IN_MILLISECONDS: Long = TimeUnit.HOURS.toMillis(24)
 
     const val SIGN_IN_REQUEST_CODE = 0
 

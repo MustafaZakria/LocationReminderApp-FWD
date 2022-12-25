@@ -223,6 +223,7 @@ class SelectLocationFragment : BaseFragment() {
     @TargetApi(29)
     private fun requestForegroundLocationPermissions() {
         if (foregroundLocationPermissionApproved()) {
+            map?.isMyLocationEnabled = true
             checkDeviceLocationSettings()
             return
         }
@@ -263,6 +264,7 @@ class SelectLocationFragment : BaseFragment() {
 
                 }.show()
         } else {
+            map?.isMyLocationEnabled = true
             checkDeviceLocationSettings()
         }
     }
@@ -292,9 +294,14 @@ class SelectLocationFragment : BaseFragment() {
         locationSettingsResponseTask.addOnFailureListener { exception ->
             if (exception is ResolvableApiException && resolve) {
                 try {
-                    exception.startResolutionForResult(
-                        requireActivity(),
-                        Constants.REQUEST_TURN_DEVICE_LOCATION_ON
+                    startIntentSenderForResult(
+                        exception.resolution.intentSender,
+                        Constants.REQUEST_TURN_DEVICE_LOCATION_ON,
+                        null,
+                        0,
+                        0,
+                        0,
+                        null
                     )
                 } catch (sendEx: IntentSender.SendIntentException) {
                     Log.d(TAG, "Error geting location settings resolution: " + sendEx.message)

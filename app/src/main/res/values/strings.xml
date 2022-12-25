@@ -51,4 +51,5 @@
     <string name="latlng">LatLng</string>
 
     <string name="reminder_pic">Reminder picture</string>
+    <string name="reminder_not_found">Reminder not found!</string>
 </resources>

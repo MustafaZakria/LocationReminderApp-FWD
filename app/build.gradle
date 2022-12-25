@@ -126,6 +126,7 @@ dependencies {
     implementation "com.google.android.gms:play-services-location:$playServicesVersionLocation"
     implementation "com.google.android.gms:play-services-maps:$playServicesVersionMaps"
 
+    androidTestImplementation "org.robolectric:shadows-framework:4.9"
     androidTestImplementation "androidx.test:runner:1.5.0"
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.uiautomator:uiautomator-v18:2.1.3'

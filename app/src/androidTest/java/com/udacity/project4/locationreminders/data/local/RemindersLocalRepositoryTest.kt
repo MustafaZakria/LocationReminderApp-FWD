@@ -1,14 +1,15 @@
 package com.udacity.project4.locationreminders.data.local
 
+import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.core.app.ApplicationProvider.getApplicationContext
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.udacity.project4.locationreminders.data.dto.ReminderDTO
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
 import org.hamcrest.MatcherAssert
 import org.hamcrest.core.Is
 import org.junit.After
@@ -18,7 +19,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import com.udacity.project4.locationreminders.data.dto.Result
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers.nullValue
+import com.udacity.project4.R
 
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
@@ -79,10 +80,22 @@ class RemindersLocalRepositoryTest {
     fun getRemindersWhileEmpty_returnNoData() = runTest {
         // GIVEN - No reminders saved in the database.
 
-        // WHEN  - Task retrieved by ID.
+        // WHEN  - get reminders.
         val result = localDataSource.getReminders()
 
         result as Result.Success
         MatcherAssert.assertThat(result.data, Is.`is`(emptyList()))
+    }
+
+    @Test
+    fun getReminderNotExist_returnDataNotFound() = runTest {
+        // GIVEN - wrong id
+        val reminderId = "200"
+
+        // WHEN  - reminder retrieved by ID.
+        val result = localDataSource.getReminder(reminderId)
+
+        result as Result.Error
+        MatcherAssert.assertThat(result.message, Is.`is`((getApplicationContext() as Context).getString(R.string.reminder_not_found)))
     }
 }

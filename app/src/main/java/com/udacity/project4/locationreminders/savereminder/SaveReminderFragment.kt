@@ -20,6 +20,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
+import com.google.android.gms.location.Geofence.NEVER_EXPIRE
 import com.google.android.material.snackbar.Snackbar
 import com.udacity.project4.BuildConfig
 import com.udacity.project4.R
@@ -30,7 +31,6 @@ import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.Constants
 import com.udacity.project4.utils.Constants.ACTION_GEOFENCE_EVENT
-import com.udacity.project4.utils.Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS
 import com.udacity.project4.utils.Constants.GEOFENCE_RADIUS_IN_METERS
 import com.udacity.project4.utils.Constants.REQUEST_TURN_DEVICE_LOCATION_ON
 import com.udacity.project4.utils.Constants.TAG
@@ -129,20 +129,26 @@ class SaveReminderFragment : BaseFragment() {
         locationSettingsResponseTask.addOnFailureListener { exception ->
             if (exception is ResolvableApiException && resolve) {
                 try {
-                    exception.startResolutionForResult(
-                        requireActivity(),
-                        REQUEST_TURN_DEVICE_LOCATION_ON
+                    startIntentSenderForResult(
+                        exception.resolution.intentSender,
+                        REQUEST_TURN_DEVICE_LOCATION_ON,
+                        null,
+                        0,
+                        0,
+                        0,
+                        null
                     )
                 } catch (sendEx: IntentSender.SendIntentException) {
                     Log.d(TAG, "Error geting location settings resolution: " + sendEx.message)
                 }
             } else {
-                Snackbar.make(
-                    requireActivity().window.decorView.rootView,
-                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
-                ).setAction(android.R.string.ok) {
-                    checkDeviceLocationSettingsAndStartGeofence()
-                }.show()
+//                Snackbar.make(
+//                    requireActivity().window.decorView.rootView,
+//                    R.string.location_required_error, Snackbar.LENGTH_INDEFINITE
+//                ).setAction(android.R.string.ok) {
+//                    checkDeviceLocationSettingsAndStartGeofence()
+//                }.show()
+                addGeofenceForReminder()
             }
         }
         locationSettingsResponseTask.addOnCompleteListener {
@@ -224,7 +230,7 @@ class SaveReminderFragment : BaseFragment() {
                 currentReminder.longitude!!,
                 GEOFENCE_RADIUS_IN_METERS
             )
-            .setExpirationDuration(GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+            .setExpirationDuration(NEVER_EXPIRE)
             .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
             .build()
 
@@ -233,8 +239,7 @@ class SaveReminderFragment : BaseFragment() {
             .addGeofence(geofence)
             .build()
 
-//        geofencingClient.removeGeofences(geofencePendingIntent).run {
-//            addOnCompleteListener {
+
         geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent).run {
             addOnSuccessListener {
                 Log.d(TAG, "geofence id:  $geofence.requestId")
@@ -246,8 +251,7 @@ class SaveReminderFragment : BaseFragment() {
                 }
             }
         }
-//            }
-//        }
+
     }
 
 
