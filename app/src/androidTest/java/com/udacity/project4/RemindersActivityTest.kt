@@ -121,7 +121,7 @@ class RemindersActivityTest :
 
         //save reminder with inserting title or description, a snackbar will show to enter title
         onView(withId(R.id.saveReminder)).perform(click())
-        onView(withId(com.google.android.material.R.id.snackbar_text))
+        onView(withId(R.id.snackbar_text))
             .check(matches(withText(R.string.err_enter_title)))
 
         //add title and description
